@@ -22,29 +22,39 @@
                 result:'',
             };
         }
-        onSubmit = (e)=>{e.preventDefault();
+        onSubmit = (e)=>{
+            e.preventDefault();
                     if(parseInt(this.state.value) === this.state.first * this.state.second){
-                        this.setState({
-                            result: '정답',
-                            first: Math.ceil(Math.random() * 9),
-                            second: Math.ceil(Math.random() * 9),
-                            value: ''
-                        });
+                        this.setState( (prevState) => { //과거 state 와 현재 state 분류 
+                        //예전 state값으로 새로운 state값을 만들 때는 리턴해주는 setState()를 사용할 것
+                            return {
+                                result: '정답: ' + prevState.value,
+                                first: Math.ceil(Math.random() * 9),
+                                second: Math.ceil(Math.random() * 9),
+                                value: ''
+                            };
+                        })
+                        this.input.focus();
                     } else {
                         this.setState({
                             result : '땡',
                             value: '',
                         });
                     }
+                    this.input.focus();
                 }
+
         onChange = (e)=>{
             this.setState({value : e.target.value})
         }
-        render(){
+
+        onRefInput = (c) =>{this.input = c;}
+
+        render(){//setState를 할때마다 렌더링이 실행된다.
             return (<React.Fragment>
                 <div>{this.state.first} 곱하기 {this.state.second}는? </div>
                 <form onSubmit = {this.onSubmit}>
-                    <input type="number" value={this.state.value} onChange={this.onChange}/>
+                    <input ref={onRefInput} type="number" value={this.state.value} onChange={this.onChange}/>
                     <button>입력!</button>
                 </form>
                 <div>{this.state.result}</div>
