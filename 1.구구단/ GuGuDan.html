@@ -12,55 +12,51 @@
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
     <script type="text/babel">
-    class GuGuDan extends React.Component{
-        constructor(props){
-            super(props);
-            this.state= {
-                first:Math.ceil(Math.random() * 9),
-                second:Math.ceil(Math.random() * 9),
-                value:'',
-                result:'',
-            };
-        }
-        onSubmit = (e)=>{
-            e.preventDefault();
-                    if(parseInt(this.state.value) === this.state.first * this.state.second){
-                        this.setState( (prevState) => { //과거 state 와 현재 state 분류 
-                        //예전 state값으로 새로운 state값을 만들 때는 리턴해주는 setState()를 사용할 것
-                            return {
-                                result: '정답: ' + prevState.value,
-                                first: Math.ceil(Math.random() * 9),
-                                second: Math.ceil(Math.random() * 9),
-                                value: ''
-                            };
-                        })
-                        this.input.focus();
-                    } else {
-                        this.setState({
-                            result : '땡',
-                            value: '',
-                        });
-                    }
-                    this.input.focus();
+        const GuGuDan = () =>{
+            //setState와 ref안 쓸 때는 함수 컴퍼넌트로 사용
+            //Hooks 는 함수형인데도 setState와 ref를 사용할 수 있게 추가해준 것
+            const [first, setFirst] = React.useState(Math.ceil(Math.random()*9));
+            const [second, setSecond] = React.useState(Math.ceil(Math.random()*9));
+            const [value, setValue] = React.useState('');
+            const [result, setResult] = React.useState('');
+            //Hooks에서는 state를 하나씩 분류 후 setState한다.
+            //무조건 컴퍼넌트안에 넣어줘야한다
+
+            //ref사용법
+            const inputRef = React.useRef(null);
+
+            const onChangeInput = (e) => {
+                //value를 setState할 때는 setValue를 사용한다.
+                setValue(e.target.value);
+            }
+
+            const onSubmitFrom =(e) => {
+                e.preventDefault();
+                if(parseInt(value) === first * second){
+                    setResult('정답' + value),
+                    setFirst(Math.ceil(Math.random()*9)),
+                    setSecond(Math.ceil(Math.random()*9)),
+                    setValue('')
+                    inputRef.current.focus();
+                }else{
+                    setResult('땡'),
+                    setValue('')
+                    inputRef.current.focus();
                 }
+            }
 
-        onChange = (e)=>{
-            this.setState({value : e.target.value})
-        }
-
-        onRefInput = (c) =>{this.input = c;}
-
-        render(){//setState를 할때마다 렌더링이 실행된다.
-            return (<React.Fragment>
-                <div>{this.state.first} 곱하기 {this.state.second}는? </div>
-                <form onSubmit = {this.onSubmit}>
-                    <input ref={onRefInput} type="number" value={this.state.value} onChange={this.onChange}/>
-                    <button>입력!</button>
+            //state바꾸면 함수 전체가 다시 실행돼서 클래스형보다 좀 더 느릴 수 있다.
+            return <React.Fragment>
+                <div>{first} 곱하기  {second} 는?</div>
+                <form onSubmit = {onSubmitFrom}>
+                    <input ref={inputRef} value ={value} onChange = {onChangeInput} />
+                    <button>입력</button>
                 </form>
-                <div>{this.state.result}</div>
-            </React.Fragment>)
+                
+                <div id="result">{result}</div> 
+                </React.Fragment>;
         }
-    }
+        //class -> className , for -> htmlFor
     </script>
     <script type="text/babel">
         ReactDOM.render(<GuGuDan/>, document.querySelector('#root'));
